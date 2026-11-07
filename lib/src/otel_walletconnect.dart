@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_walletconnect_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_walletconnect';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class WalletConnectResult {
+  /// Creates a result.
   const WalletConnectResult({
     this.protocol,
     this.projectId,
@@ -90,8 +91,13 @@ class WalletConnectResult {
   final String? errorMessage;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class WalletConnectCallResult<T> {
+  /// Creates a call result.
   const WalletConnectCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final WalletConnectResult? result;
 }
@@ -120,7 +126,7 @@ Future<T> tracedWalletConnect<T>({
   final span = _tracer().startSpan(
     'walletconnect $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
@@ -128,109 +134,109 @@ Future<T> tracedWalletConnect<T>({
       final res = r.result!;
       final extras = <Attribute<Object>>[];
       if (res.protocol != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.protocol',
           res.protocol!,
         ));
       }
       if (res.projectId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.project.id',
           res.projectId!,
         ));
       }
       if (res.relayUrl != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.relay.url',
           res.relayUrl!,
         ));
       }
       if (res.topic != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.session.topic',
           res.topic!,
         ));
       }
       if (res.pairingTopic != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.pairing.topic',
           res.pairingTopic!,
         ));
       }
       if (res.peerName != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.peer.name',
           res.peerName!,
         ));
       }
       if (res.peerUrl != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.peer.url',
           res.peerUrl!,
         ));
       }
       if (res.walletId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.wallet.id',
           res.walletId!,
         ));
       }
       if (res.chainId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.chain.id',
           res.chainId!,
         ));
       }
       if (res.chainNamespace != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.chain.namespace',
           res.chainNamespace!,
         ));
       }
       if (res.address != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.account.address',
           res.address!,
         ));
       }
       if (res.requestedNamespaces != null) {
-        extras.add(OTel.attributeStringList(
+        extras.add(OTelAPI.attributeStringList(
           'walletconnect.namespaces.requested',
           res.requestedNamespaces!,
         ));
       }
       if (res.approvedNamespaces != null) {
-        extras.add(OTel.attributeStringList(
+        extras.add(OTelAPI.attributeStringList(
           'walletconnect.namespaces.approved',
           res.approvedNamespaces!,
         ));
       }
       if (res.method != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.rpc.method',
           res.method!,
         ));
       }
       if (res.requestedMethods != null) {
-        extras.add(OTel.attributeStringList(
+        extras.add(OTelAPI.attributeStringList(
           'walletconnect.rpc.methods_requested',
           res.requestedMethods!,
         ));
       }
       if (res.expiryUnixSec != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'walletconnect.session.expiry_unix_sec',
           res.expiryUnixSec!,
         ));
       }
       if (res.userRejected != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'walletconnect.user_rejected',
           res.userRejected!,
         ));
       }
       if (res.errorCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.error.code',
           res.errorCode!,
         ));
@@ -240,18 +246,18 @@ Future<T> tracedWalletConnect<T>({
         );
       }
       if (res.errorMessage != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'walletconnect.error.message',
           res.errorMessage!,
         ));
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
